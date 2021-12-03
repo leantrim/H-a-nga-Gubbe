@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import randomWords from "./Services/randomWords";
-import SourcePage from "./components/SourcePage";
 import img0 from "./images/0.png";
 import img1 from "./images/1.png";
 import img2 from "./images/2.png";
@@ -34,59 +33,53 @@ function App() {
   let [maxGuesses] = useState(10);
   const [underScoreH, setUnderScoreH] = useState([]);
   const [isGenerated, setGenerated] = useState(false);
-  let underScore = [];
-  const keyBoardLetters = [];
 
+  // Function för att skapa ett object med understräck
   const createUnderscores = (wordLength) => {
+    let underScore = [];
     for (let i = 0; i < wordLength; i++) {
       underScore.push(`_`);
     }
     return underScore;
   };
 
-  const generateKeyboard = () => {
-    for (let i = 65; i < 91; i++) {
-      keyBoardLetters[i] = {
-        word: String.fromCharCode(i),
-        used: "no",
-        correctLetter: false,
-      };
-    }
-    console.log(keyBoardLetters);
-  };
-
   const keyPress = (event) => {
     const letter = String.fromCharCode(event.keyCode);
     const tempWordsNeeded = wordsNeededToGuess;
+    // Är knappen en bokstav?
     if (event.keyCode >= 65 && event.keyCode <= 90) {
       for (let i = 0; i < wordToGuess.length; i++) {
+        // Matchar bokstaven med någon av bokstaven i gissningen? Är bokstaven ej gissad redan?
         if (wordToGuess[i] === letter.toLowerCase() && underScoreH[i] === "_") {
+          // Ändra _ till bokstaven man gissa rätt på
           underScoreH[i] = letter.toLowerCase();
           setUnderScoreH([...underScoreH]);
+          // Ett ord mindre att gissa
           wordsNeededToGuess--;
           setNeededGuests(wordsNeededToGuess);
-          console.log(wordsNeededToGuess, underScoreH);
         }
       }
-      // Has user failed with the letter?
+      // Har användaren misslyckats med att gissa någon bokstav?
       if (tempWordsNeeded === wordsNeededToGuess) {
         let isLetterPostedInArray = false;
+        // Finns redan det gissade bokstaven i försöklistan?
         for (const letterIn of guessLetters) {
           if (letterIn === letter.toLowerCase()) isLetterPostedInArray = true;
         }
+        // Lägg till det misslyckade bokstaven i listan
         if (!isLetterPostedInArray) {
           guessLetters.push(letter.toLowerCase());
           setGuessLetters([...guessLetters]);
         }
       }
-      // Failed with the game
+      // Gubben hängdes :(
       if (maxGuesses - guessLetters.length === 0) {
         toast.error(
           `You have failed, word was:${wordToGuess} ....Loading new game...`
         );
         return setTimeout(generateNewGame, 2000);
       }
-      // Succeded with the game!
+      // Spelet avklarat!
       if (wordsNeededToGuess === 0) {
         toast.success("You have guessed all the words!  Loading new game...");
         return setTimeout(generateNewGame, 2000);
@@ -95,7 +88,6 @@ function App() {
   };
 
   const generateNewGame = () => {
-    generateKeyboard();
     // Generera random nummer för att få fram en array word
     const index = Math.floor(Math.random() * randomWords.length);
     // Lagra längden på arrayen
@@ -148,8 +140,9 @@ function App() {
       case 10:
         return img1;
       default:
-      // code block
     }
+    // VARFÖR FUNKAR INTE DETTA ?!!?!
+    // return `./images/${id}.png`;
   };
 
   return (
@@ -162,7 +155,6 @@ function App() {
           <div className="text">
             <h1>{underScoreH.map((x) => x + " ")}</h1>
             <h4>{guessLetters.map((f) => f + " ")}</h4>
-            <h3>{keyBoardLetters.map((word) => word.name)}</h3>
             <p>Försök kvar: {maxGuesses - guessLetters.length}</p>
           </div>
         </div>
